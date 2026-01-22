@@ -5,6 +5,7 @@ import SearchBar from "../components/SearchBar";
 import UnitToggle from "../components/UnitToggle";
 import CurrentWeather from "../components/CurrentWeather";
 import Forecast from "../components/Forecast";
+import ServerClock from "../components/ServerClock";
 
 export default function Home() {
   const [location, setLocation] = useState<string | null>(null);
@@ -56,6 +57,9 @@ export default function Home() {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white text-shadow-lg">
               Weather
             </h1>
+            <div className="mt-2">
+              <ServerClock />
+            </div>
           </header>
 
           <div className="mb-6">

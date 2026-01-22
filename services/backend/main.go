@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"io"
@@ -36,6 +37,7 @@ func main() {
 	http.HandleFunc("/weather", weatherHandler)
 	http.HandleFunc("/search", searchHandler)
 	http.HandleFunc("/health", healthHandler)
+	http.HandleFunc("/time", timeHandler)
 	log.Println("Backend server starting on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("could not start server: %s\n", err)
@@ -157,4 +159,23 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"status":"healthy","redis":"up"}`))
+}
+
+func timeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	currentTime := time.Now().UTC()
+	response := map[string]interface{}{
+		"time":      currentTime.Format(time.RFC3339),
+		"timestamp": currentTime.Unix(),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Error encoding time response: %s", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
 }
