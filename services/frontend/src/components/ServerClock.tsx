@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 export default function ServerClock() {
-    const [time, setTime] = useState<string | null>(null);
+    const [time, setTime] = useState<Date | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -13,16 +13,30 @@ export default function ServerClock() {
                 const res = await fetch(`${apiUrl}/time`);
                 if (!res.ok) throw new Error('Failed to fetch server time');
                 const data = await res.json();
-                setTime(new Date(data.time).toLocaleString());
+                setTime(new Date(data.time));
             } catch {
                 setError('Unable to fetch server time');
             }
         };
 
+        // Initial fetch
         fetchTime();
-        const interval = setInterval(fetchTime, 1000);
+        
+        // Sync with server every 30 seconds
+        const syncInterval = setInterval(fetchTime, 30000);
 
-        return () => clearInterval(interval);
+        // Update display every second using local time
+        const displayInterval = setInterval(() => {
+            setTime(prevTime => {
+                if (!prevTime) return null;
+                return new Date(prevTime.getTime() + 1000);
+            });
+        }, 1000);
+
+        return () => {
+            clearInterval(syncInterval);
+            clearInterval(displayInterval);
+        };
     }, []);
 
     if (error) {
@@ -43,7 +57,7 @@ export default function ServerClock() {
 
     return (
         <div className="text-white/90 text-sm font-medium" role="status" aria-live="polite" aria-label="Server time">
-            Server Time: {time}
+            Server Time: {time.toLocaleString()}
         </div>
     );
 }

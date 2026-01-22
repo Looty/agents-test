@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"io"
@@ -161,8 +162,20 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func timeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	currentTime := time.Now().UTC()
-	response := fmt.Sprintf(`{"time":"%s","timestamp":%d}`, currentTime.Format(time.RFC3339), currentTime.Unix())
+	response := map[string]interface{}{
+		"time":      currentTime.Format(time.RFC3339),
+		"timestamp": currentTime.Unix(),
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(response))
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Error encoding time response: %s", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
 }
