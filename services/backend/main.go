@@ -36,6 +36,7 @@ func main() {
 	http.HandleFunc("/weather", weatherHandler)
 	http.HandleFunc("/search", searchHandler)
 	http.HandleFunc("/health", healthHandler)
+	http.HandleFunc("/time", timeHandler)
 	log.Println("Backend server starting on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("could not start server: %s\n", err)
@@ -157,4 +158,11 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"status":"healthy","redis":"up"}`))
+}
+
+func timeHandler(w http.ResponseWriter, r *http.Request) {
+	currentTime := time.Now().UTC()
+	response := fmt.Sprintf(`{"time":"%s","timestamp":%d}`, currentTime.Format(time.RFC3339), currentTime.Unix())
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(response))
 }
