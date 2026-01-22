@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+coverage
+.env*.local
+src/test
+src/**/*.test.tsx
+src/**/*.test.ts
+vitest.config.ts
+!README.md
