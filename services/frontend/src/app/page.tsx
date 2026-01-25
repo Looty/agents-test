@@ -57,6 +57,9 @@ export default function Home() {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white text-shadow-lg">
               Weather
             </h1>
+            <div className="flex justify-center mt-4">
+              <img src="/pug.svg" alt="Cute pug" className="w-24 h-24" />
+            </div>
             <div className="mt-2">
               <ServerClock />
             </div>
